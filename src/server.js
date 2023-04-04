@@ -3,14 +3,13 @@ import cors from 'cors'
 import {pool} from './db.js'
 import {PORT} from './config.js'
 
+import indexRoutes from './routes/index.routes.js'
+
 const app = express()
 app.use(cors())
+app.use(indexRoutes)
 
 // routes --------------------
-app.get('/ping', async (req, res)=>{
-   const [result] = await pool.query('SELECT "Hello world" AS result');
-   res.json(result[0])
-})
 
 app.get('/asignaturas', async (req, res)=>{
 
