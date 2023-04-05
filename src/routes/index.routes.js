@@ -19,7 +19,11 @@ router.get('/ping', async (req, res)=>{
 //Session----------
 router.post('/session', requestSession)
 
-//Tutor-classes
+//Tutor------------
 router.get('/tutor/:tutorId', getTutorsByClass)
+
+//Classes----------
+router.get('/classes/:classId', getClassesByTutor)
+
 
 export default router;
