@@ -6,6 +6,8 @@ import {PORT} from './config.js'
 import indexRoutes from './routes/index.routes.js'
 
 const app = express()
+
+app.use(express.json())
 app.use(cors())
 
 app.use(indexRoutes)
@@ -14,7 +16,7 @@ app.use(indexRoutes)
 
 app.get('/asignaturas', async (req, res)=>{
 
-    const [rows] = await pool.query('SELECT classes.name, school.code FROM classes INNER JOIN school ON classes.id_school = school.id')
+    const [rows] = await pool.query('SELECT classes.id, classes.name, school.code FROM classes INNER JOIN school ON classes.id_school = school.id')
     res.json(rows)
 })
 app.get('/tutores', async (req, res)=>{
