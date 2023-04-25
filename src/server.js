@@ -15,7 +15,8 @@ app.use(cors(
     {
         origin: [
             "http://localhost:3000",
-            "http://192.168.20.105:3000"
+            "http://192.168.20.105:3000",
+            "tutoyt-react-production.up.railway.app"
     ],
         credentials: true
     }
