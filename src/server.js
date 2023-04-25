@@ -69,6 +69,7 @@ app.post('/login', async (req, res)=>{
         res.cookie('token', token, {
             sameSite: 'lax'
         })
+        console.log(`User ${user} logged`)
         return res.json({Status: "Success"})
     }
     else{
