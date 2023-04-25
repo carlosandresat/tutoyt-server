@@ -11,7 +11,15 @@ const app = express()
 
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors())
+app.use(cors(
+    {
+        origin: [
+            "http://localhost:3000",
+            "http://192.168.20.105:3000"
+    ],
+        credentials: true
+    }
+))
 
 app.use(indexRoutes)
 
@@ -28,6 +36,26 @@ app.get('/tutores', async (req, res)=>{
     res.json(rows)    
 })
 
+const verifyUser = (req, res, next) => {
+    const token = req.cookies.token
+    if(!token) {
+        return res.json({Message: "No estás conectado. Inicia sesión."})
+    } else {
+        jwt.verify(token, "tutoyt-key0963963170", (err, decoded) => {
+            if(err){
+                return res.json({Message: "Authentication Error."})
+            } else {
+                req.user = decoded.user
+                next()
+            }
+        })
+    }
+}
+
+app.get('/', verifyUser, (req, res) => {
+    return res.json({Status: "Success", user: req.user})
+})
+
 app.post('/login', async (req, res)=>{
     const { user, password } = req.body;
     const [result] = await pool.query(
@@ -37,13 +65,21 @@ app.post('/login', async (req, res)=>{
     if(result.length > 0) {
         const user = result[0].user
         const token = jwt.sign({user}, "tutoyt-key0963963170", {expiresIn: '1d'})
-        res.cookie('token', token)
+        res.cookie('token', token, {
+            sameSite: 'lax'
+        })
         return res.json({Status: "Success"})
     }
     else{
         return res.json({message: "Usuario o contraseña no válidos"})
     }
 })
+
+app.get('/logout', (req, res)=>{
+    res.clearCookie('token')
+    return res.json({Status: "Success"})
+})
+
 
 // Server running -------------------
 app.listen(PORT)
