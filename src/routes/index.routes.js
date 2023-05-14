@@ -10,6 +10,11 @@ import {
     getClassesByTutor
 } from "../controllers/tutor-classes.controller.js";
 
+import { 
+    createUser,
+    checkUser
+} from "../controllers/register.controllers.js";
+
 const router = Router();
 
 router.get('/ping', async (req, res)=>{
@@ -27,5 +32,8 @@ router.get('/tutor/:tutorId', getTutorsByClass)
 //Classes----------
 router.get('/classes/:classId', getClassesByTutor)
 
+//Register-------------
+router.post('/newUser', createUser)
+router.get('/checkUser/:user', checkUser)
 
 export default router;
