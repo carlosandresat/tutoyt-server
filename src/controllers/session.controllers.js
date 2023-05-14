@@ -21,3 +21,12 @@ export const getSessionsByTutor = (req, res) => {
     res.send('sessions by tutor')
 }
 
+export const getSessionsByStudent = async (req, res) => {
+    const [result] = await pool.query("SELECT status, date, time, name, code FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE id_student = (SELECT id from user WHERE user = ?)", [
+        req.params.user,
+    ])
+    if(result.length == 0)
+        return res.status(404).json({message: "No hay tutorías"});
+
+    res.json(result)
+}

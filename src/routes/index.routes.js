@@ -2,7 +2,8 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import {  
     requestSession,
-    getSessionsByTutor
+    getSessionsByTutor,
+    getSessionsByStudent
 } from "../controllers/session.controllers.js";
 import {  
     getTutorsByClass,
@@ -18,6 +19,7 @@ router.get('/ping', async (req, res)=>{
 
 //Session----------
 router.post('/session', requestSession)
+router.get('/session/:user', getSessionsByStudent)
 
 //Tutor------------
 router.get('/tutor/:tutorId', getTutorsByClass)
