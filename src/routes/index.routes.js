@@ -3,7 +3,8 @@ import { pool } from "../db.js";
 import {  
     requestSession,
     getSessionsByTutor,
-    getSessionsByStudent
+    getSessionsByStudent,
+    cancelSession
 } from "../controllers/session.controllers.js";
 import {  
     getTutorsByClass,
@@ -25,6 +26,7 @@ router.get('/ping', async (req, res)=>{
 //Session----------
 router.post('/session', requestSession)
 router.get('/session/:user', getSessionsByStudent)
+router.put('/session/cancel/:sessionId', cancelSession)
 
 //Tutor------------
 router.get('/tutor/:tutorId', getTutorsByClass)

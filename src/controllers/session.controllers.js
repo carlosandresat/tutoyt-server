@@ -7,13 +7,17 @@ export const requestSession = async (req, res) => {
         [student, tutor, className, date, time]
     );
 
+    const [newTutoring] = await pool.query("SELECT status, DATE_FORMAT(date, '%d/%c/%Y') AS date, code FROM session INNER JOIN (SELECT classes.id, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE session.id =  ?", [
+        result.insertId,
+    ])
+
     res.json({
         id: result.insertId,
-        student, 
-        tutor, 
-        className, 
-        date, 
-        time
+        name: className, 
+        date: newTutoring[0].date, 
+        time,
+        status: newTutoring[0].status,
+        code: newTutoring[0].code
     });
 }
 
@@ -22,11 +26,18 @@ export const getSessionsByTutor = (req, res) => {
 }
 
 export const getSessionsByStudent = async (req, res) => {
-    const [result] = await pool.query("SELECT status, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, name, code FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE id_student = (SELECT id from user WHERE user = ?) ORDER BY date, time", [
+    const [result] = await pool.query("SELECT session.id, status, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, name, code FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE id_student = (SELECT id from user WHERE user = ?) ORDER BY date_raw, time", [
         req.params.user,
     ])
     if(result.length == 0)
         return res.status(404).json({message: "No hay tutorías"});
 
+    res.json(result)
+}
+
+export const cancelSession = async (req, res) => {
+    const result = await pool.query("UPDATE session SET status = 'canceled' WHERE id = ?", [
+        req.params.sessionId,
+    ]);
     res.json(result)
 }
