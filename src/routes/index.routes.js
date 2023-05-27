@@ -26,6 +26,7 @@ router.get('/ping', async (req, res)=>{
 //Session----------
 router.post('/session', requestSession)
 router.get('/session/:user', getSessionsByStudent)
+router.get('/session/tutor/:user', getSessionsByTutor)
 router.put('/session/cancel/:sessionId', cancelSession)
 
 //Tutor------------

@@ -21,12 +21,18 @@ export const requestSession = async (req, res) => {
     });
 }
 
-export const getSessionsByTutor = (req, res) => {
-    res.send('sessions by tutor')
+export const getSessionsByTutor = async (req, res) => {
+    const [result] = await pool.query("SELECT session.id, session.topic, session.status, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, classes.name as classname, user.name as student FROM session INNER JOIN classes ON session.id_class = classes.id INNER JOIN user ON session.id_student = user.id WHERE id_tutor = (SELECT id from user WHERE user = ?) AND date >= CURDATE() ORDER BY date_raw, time", [
+        req.params.user,
+    ])
+    if(result.length == 0)
+        return res.status(404).json({message: "No hay tutorías"});
+
+    res.json(result)
 }
 
 export const getSessionsByStudent = async (req, res) => {
-    const [result] = await pool.query("SELECT session.id, status, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, name, code FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE id_student = (SELECT id from user WHERE user = ?) ORDER BY date_raw, time", [
+    const [result] = await pool.query("SELECT session.id, status, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, name, code FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE id_student = (SELECT id from user WHERE user = ?) AND date >= CURDATE() ORDER BY date_raw, time", [
         req.params.user,
     ])
     if(result.length == 0)

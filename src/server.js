@@ -47,6 +47,7 @@ const verifyUser = (req, res, next) => {
                 return res.json({Message: "Authentication Error."})
             } else {
                 req.user = decoded.user
+                req.type = decoded.type
                 next()
             }
         })
@@ -54,7 +55,7 @@ const verifyUser = (req, res, next) => {
 }
 
 app.get('/', verifyUser, (req, res) => {
-    return res.json({Status: "Success", user: req.user})
+    return res.json({Status: "Success", user: req.user, type: req.type})
 })
 
 app.post('/login', async (req, res)=>{
@@ -65,7 +66,7 @@ app.post('/login', async (req, res)=>{
     )
     if(result.length > 0) {
         const user = result[0].user
-        const token = jwt.sign({user}, "tutoyt-key0963963170", {expiresIn: '1d'})
+        const token = jwt.sign({user, type: result[0].status}, "tutoyt-key0963963170", {expiresIn: '1d'})
         res.cookie('token', token, {
             sameSite: 'lax'
         })
