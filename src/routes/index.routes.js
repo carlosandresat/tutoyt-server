@@ -4,6 +4,7 @@ import {
     requestSession,
     getSessionsByTutor,
     getSessionsByStudent,
+    acceptSession,
     cancelSession
 } from "../controllers/session.controllers.js";
 import {  
@@ -27,6 +28,7 @@ router.get('/ping', async (req, res)=>{
 router.post('/session', requestSession)
 router.get('/session/:user', getSessionsByStudent)
 router.get('/session/tutor/:user', getSessionsByTutor)
+router.put('/session/accept/:sessionId', acceptSession)
 router.put('/session/cancel/:sessionId', cancelSession)
 
 //Tutor------------

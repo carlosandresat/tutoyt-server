@@ -47,3 +47,10 @@ export const cancelSession = async (req, res) => {
     ]);
     res.json(result)
 }
+
+export const acceptSession = async (req, res) => {
+    const result = await pool.query("UPDATE session SET status = 'accepted' WHERE id = ?", [
+        req.params.sessionId,
+    ]);
+    res.json(result)
+}
