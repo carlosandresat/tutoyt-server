@@ -54,3 +54,66 @@ export const acceptSession = async (req, res) => {
     ]);
     res.json(result)
 }
+
+export const updateDate = async (req, res) => {
+    const { date, time } = req.body;
+
+    const result = await pool.query("UPDATE session SET date = ?, time = ?, changes = 'fecha/hora' WHERE id = ?", [
+        date, time, req.params.sessionId
+    ]);
+    res.json(result)
+}
+
+export const updatePlace = async (req, res) => {
+    const { place } = req.body;
+
+    const result = await pool.query("UPDATE session SET place = ?, changes = 'lugar' WHERE id = ?", [
+        place, req.params.sessionId
+    ]);
+    res.json(result)
+}
+
+export const updateTopic = async (req, res) => {
+    const { topic } = req.body;
+
+    const result = await pool.query("UPDATE session SET topic = ?, changes = 'tema' WHERE id = ?", [
+        topic, req.params.sessionId
+    ]);
+    res.json(result)
+}
+
+export const updateDatePlace = async (req, res) => {
+    const { date, time, place } = req.body;
+
+    const result = await pool.query("UPDATE session SET date = ?, time = ?,  place = ?, changes = 'fecha/hora y lugar' WHERE id = ?", [
+        date, time, place, req.params.sessionId
+    ]);
+    res.json(result)
+}
+
+export const updateDateTopic = async (req, res) => {
+    const { date, time, topic } = req.body;
+
+    const result = await pool.query("UPDATE session SET date = ?, time = ?,  topic = ?, changes = 'fecha/hora y tema' WHERE id = ?", [
+        date, time, topic, req.params.sessionId
+    ]);
+    res.json(result)
+}
+
+export const updatePlaceTopic = async (req, res) => {
+    const { place, topic } = req.body;
+
+    const result = await pool.query("UPDATE session SET place = ?,  topic = ?, changes = 'lugar y tema' WHERE id = ?", [
+        place, topic, req.params.sessionId
+    ]);
+    res.json(result)
+}
+
+export const updateAll = async (req, res) => {
+    const { date, time, place, topic } = req.body;
+
+    const result = await pool.query("UPDATE session SET date = ?, time = ?, place = ?,  topic = ?, changes = 'fecha/hora, lugar y tema' WHERE id = ?", [
+        date, time, place, topic, req.params.sessionId
+    ]);
+    res.json(result)
+}

@@ -5,7 +5,14 @@ import {
     getSessionsByTutor,
     getSessionsByStudent,
     acceptSession,
-    cancelSession
+    cancelSession,
+    updateDate,
+    updatePlace,
+    updateTopic,
+    updateDatePlace,
+    updateDateTopic,
+    updatePlaceTopic,
+    updateAll
 } from "../controllers/session.controllers.js";
 import {  
     getTutorsByClass,
@@ -30,6 +37,14 @@ router.get('/session/:user', getSessionsByStudent)
 router.get('/session/tutor/:user', getSessionsByTutor)
 router.put('/session/accept/:sessionId', acceptSession)
 router.put('/session/cancel/:sessionId', cancelSession)
+router.put('/session/update/date/:sessionId', updateDate)
+router.put('/session/update/place/:sessionId', updatePlace)
+router.put('/session/update/topic/:sessionId', updateTopic)
+router.put('/session/update/date-place/:sessionId', updateDatePlace)
+router.put('/session/update/date-topic/:sessionId', updateDateTopic)
+router.put('/session/update/place-topic/:sessionId', updatePlaceTopic)
+router.put('/session/update/all/:sessionId', updateAll)
+
 
 //Tutor------------
 router.get('/tutor/:tutorId', getTutorsByClass)
