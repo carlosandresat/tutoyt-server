@@ -61,7 +61,10 @@ export const updateDate = async (req, res) => {
     const result = await pool.query("UPDATE session SET date = ?, time = ?, changes = 'fecha/hora' WHERE id = ?", [
         date, time, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({ 
+        date, 
+        time
+    })
 }
 
 export const updatePlace = async (req, res) => {
@@ -70,7 +73,7 @@ export const updatePlace = async (req, res) => {
     const result = await pool.query("UPDATE session SET place = ?, changes = 'lugar' WHERE id = ?", [
         place, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({ place })
 }
 
 export const updateTopic = async (req, res) => {
@@ -79,7 +82,7 @@ export const updateTopic = async (req, res) => {
     const result = await pool.query("UPDATE session SET topic = ?, changes = 'tema' WHERE id = ?", [
         topic, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({ topic })
 }
 
 export const updateDatePlace = async (req, res) => {
@@ -88,7 +91,7 @@ export const updateDatePlace = async (req, res) => {
     const result = await pool.query("UPDATE session SET date = ?, time = ?,  place = ?, changes = 'fecha/hora y lugar' WHERE id = ?", [
         date, time, place, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({ date, time, place })
 }
 
 export const updateDateTopic = async (req, res) => {
@@ -97,7 +100,7 @@ export const updateDateTopic = async (req, res) => {
     const result = await pool.query("UPDATE session SET date = ?, time = ?,  topic = ?, changes = 'fecha/hora y tema' WHERE id = ?", [
         date, time, topic, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({ date, time, topic })
 }
 
 export const updatePlaceTopic = async (req, res) => {
@@ -106,7 +109,7 @@ export const updatePlaceTopic = async (req, res) => {
     const result = await pool.query("UPDATE session SET place = ?,  topic = ?, changes = 'lugar y tema' WHERE id = ?", [
         place, topic, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({ place, topic })
 }
 
 export const updateAll = async (req, res) => {
@@ -115,5 +118,10 @@ export const updateAll = async (req, res) => {
     const result = await pool.query("UPDATE session SET date = ?, time = ?, place = ?,  topic = ?, changes = 'fecha/hora, lugar y tema' WHERE id = ?", [
         date, time, place, topic, req.params.sessionId
     ]);
-    res.json(result)
+    res.json({
+        date,
+        time,
+        place,
+        topic,
+    })
 }
