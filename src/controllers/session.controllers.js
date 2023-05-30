@@ -1,10 +1,10 @@
 import { pool } from "../db.js"
 
 export const requestSession = async (req, res) => {
-    const { student, tutor, className, date, time, topic} = req.body;
+    const { student, tutor, className, date, time, place, topic} = req.body;
     const [result] = await pool.query(
-        "INSERT INTO session(id_student, id_tutor, id_class, status, date, time, topic) VALUES ((SELECT id FROM user where user= ?), (SELECT id FROM user where name= ?), (SELECT id FROM classes where name= ?), 'requested', ?, ?, ?)",
-        [student, tutor, className, date, time, topic]
+        "INSERT INTO session(id_student, id_tutor, id_class, status, date, time, place, topic) VALUES ((SELECT id FROM user where user= ?), (SELECT id FROM user where name= ?), (SELECT id FROM classes where name= ?), 'requested', ?, ?, ?, ?)",
+        [student, tutor, className, date, time, place, topic]
     );
 
     const [newTutoring] = await pool.query("SELECT status, DATE_FORMAT(date, '%d/%c/%Y') AS date, code FROM session INNER JOIN (SELECT classes.id, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE session.id =  ?", [
