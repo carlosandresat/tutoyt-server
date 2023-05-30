@@ -12,7 +12,8 @@ import {
     updateDatePlace,
     updateDateTopic,
     updatePlaceTopic,
-    updateAll
+    updateAll,
+    rateSession
 } from "../controllers/session.controllers.js";
 import {  
     getTutorsByClass,
@@ -44,6 +45,7 @@ router.put('/session/update/date-place/:sessionId', updateDatePlace)
 router.put('/session/update/date-topic/:sessionId', updateDateTopic)
 router.put('/session/update/place-topic/:sessionId', updatePlaceTopic)
 router.put('/session/update/all/:sessionId', updateAll)
+router.put('/session/rate/:sessionId', rateSession)
 
 
 //Tutor------------
