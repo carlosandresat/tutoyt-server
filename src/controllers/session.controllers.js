@@ -7,15 +7,19 @@ export const requestSession = async (req, res) => {
         [student, tutor, className, date, time, place, topic]
     );
 
-    const [newTutoring] = await pool.query("SELECT status, DATE_FORMAT(date, '%d/%c/%Y') AS date, code FROM session INNER JOIN (SELECT classes.id, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE session.id =  ?", [
+    const [newTutoring] = await pool.query("SELECT status, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, code FROM session INNER JOIN (SELECT classes.id, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE session.id =  ?", [
         result.insertId,
     ])
 
     res.json({
         id: result.insertId,
         name: className, 
+        date_raw: newTutoring[0].date_raw,
         date: newTutoring[0].date, 
         time,
+        place,
+        topic,
+        tutor,
         status: newTutoring[0].status,
         code: newTutoring[0].code
     });
