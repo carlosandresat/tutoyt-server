@@ -20,6 +20,10 @@ import {
     getClassesByTutor
 } from "../controllers/tutor-classes.controller.js";
 
+import {
+    getClassesList
+} from "../controllers/classes.controller.js";
+
 import { 
     createUser,
     checkUser
@@ -35,6 +39,7 @@ router.get('/ping', async (req, res)=>{
 //Session----------
 router.post('/session', requestSession)
 router.get('/session/:user', getSessionsByStudent)
+router.get('/classes/tutor/:user', getClassesList)
 router.get('/session/tutor/:user', getSessionsByTutor)
 router.put('/session/accept/:sessionId', acceptSession)
 router.put('/session/cancel/:sessionId', cancelSession)
