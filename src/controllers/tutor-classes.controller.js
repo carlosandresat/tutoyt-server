@@ -19,3 +19,22 @@ export const getClassesByTutor = async (req, res) => {
 
     res.json(result)
 }
+
+export const insertTutorClasses = async (req, res) => {
+    const { id_tutor, id_class} = req.body;
+    const [result] = await pool.query(
+        "INSERT INTO tutor_classes(id_tutor, id_classes) VALUES (?, ?)",
+        [id_tutor, id_class]
+    );
+
+    res.json(result);
+}
+
+export const deleteTutorClasses = async (req, res) => {
+    const [result] = await pool.query(
+        "DELETE FROM tutor_classes WHERE id_tutor = ?",
+        [req.params.tutorId]
+    );
+
+    res.json(result);
+}

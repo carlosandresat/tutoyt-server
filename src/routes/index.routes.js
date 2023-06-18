@@ -17,7 +17,9 @@ import {
 } from "../controllers/session.controllers.js";
 import {  
     getTutorsByClass,
-    getClassesByTutor
+    getClassesByTutor,
+    insertTutorClasses,
+    deleteTutorClasses
 } from "../controllers/tutor-classes.controller.js";
 
 import {
@@ -55,6 +57,8 @@ router.put('/session/rate/:sessionId', rateSession)
 
 //Tutor------------
 router.get('/tutor/:tutorId', getTutorsByClass)
+router.post('/tutor/classes', insertTutorClasses)
+router.delete('/tutor/classes/:tutorId', deleteTutorClasses)
 
 //Classes----------
 router.get('/classes/:classId', getClassesByTutor)
