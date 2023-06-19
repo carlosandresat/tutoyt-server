@@ -25,3 +25,12 @@ export const createUser = async (req, res) => {
     });
 }
 
+export const registerUser = async (req, res) => {
+    const { user_id, name, pic_url, nickname} = req.body;
+    const [result] = await pool.query(
+        "INSERT INTO user(id, name, pic_url, nickname) VALUES (?, ?, ?, ?)",
+        [user_id, name, pic_url, nickname]
+    );
+
+    res.json(result);
+}
