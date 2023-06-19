@@ -3,7 +3,7 @@ import { pool } from "../db.js"
 export const requestSession = async (req, res) => {
     const { student, tutor, className, date, time, place, topic} = req.body;
     const [result] = await pool.query(
-        "INSERT INTO session(id_student, id_tutor, id_class, status, date, time, place, topic) VALUES ((SELECT id FROM user where user= ?), (SELECT id FROM user where name= ?), (SELECT id FROM classes where name= ?), 'requested', ?, ?, ?, ?)",
+        "INSERT INTO session(id_student, id_tutor, id_class, status, date, time, place, topic) VALUES (?, (SELECT id FROM user where name= ?), (SELECT id FROM classes where name= ?), 'requested', ?, ?, ?, ?)",
         [student, tutor, className, date, time, place, topic]
     );
 
