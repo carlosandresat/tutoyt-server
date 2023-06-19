@@ -33,7 +33,7 @@ app.get('/asignaturas', async (req, res)=>{
 })
 app.get('/tutores', async (req, res)=>{
 
-    const [rows] = await pool.query('SELECT t2.id_tutor AS id, t1.name, TRUNCATE(t2.rating, 1) AS rating, t2.nreviews FROM user t1 INNER JOIN (SELECT id_tutor, AVG(stars) AS rating, COUNT(stars) as nreviews FROM session GROUP BY id_tutor) t2 WHERE t1.id = t2.id_tutor ORDER BY rating DESC')
+    const [rows] = await pool.query('SELECT    u.name,    u.pic_url,    TRUNCATE(AVG(s.stars), 1) AS rating  FROM    user u    INNER JOIN session s ON u.id = s.id_tutor  GROUP BY    u.name,    u.pic_url  HAVING    COUNT(s.id) >= 1  ORDER BY    rating DESC')
     res.json(rows)    
 })
 

@@ -41,7 +41,7 @@ router.get('/ping', async (req, res)=>{
 
 //Session----------
 router.post('/session', requestSession)
-router.get('/session/:user', getSessionsByStudent)
+router.get('/session/:id', getSessionsByStudent)
 router.get('/classes/tutor/:user', getClassesList)
 router.get('/session/tutor/:user', getSessionsByTutor)
 router.put('/session/accept/:sessionId', acceptSession)
