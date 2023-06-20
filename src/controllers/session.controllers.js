@@ -26,8 +26,8 @@ export const requestSession = async (req, res) => {
 }
 
 export const getSessionsByTutor = async (req, res) => {
-    const [result] = await pool.query("SELECT session.id, session.topic, session.status, session.place, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, classes.name as classname, user.name as student FROM session INNER JOIN classes ON session.id_class = classes.id INNER JOIN user ON session.id_student = user.id WHERE id_tutor = (SELECT id from user WHERE user = ?) AND date >= CURDATE() ORDER BY date_raw, time", [
-        req.params.user,
+    const [result] = await pool.query("SELECT session.id, session.topic, session.status, session.place, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, classes.name as classname, user.name as student FROM session INNER JOIN classes ON session.id_class = classes.id INNER JOIN user ON session.id_student = user.id WHERE id_tutor = ? AND date >= CURDATE() ORDER BY date_raw, time", [
+        req.params.id,
     ])
     if(result.length == 0)
         return res.status(404).json({message: "No hay tutorías"});

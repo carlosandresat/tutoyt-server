@@ -5,7 +5,7 @@ export const getTutorsByClass = async (req, res) => {
         req.params.tutorId,
     ])
     if(result.length == 0)
-        return res.status(404).json({message: "Tutors not found"});
+        return res.json({message: "Tutors not found"});
 
     res.json(result)
 }

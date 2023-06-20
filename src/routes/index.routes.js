@@ -43,7 +43,7 @@ router.get('/ping', async (req, res)=>{
 router.post('/session', requestSession)
 router.get('/session/:id', getSessionsByStudent)
 router.get('/classes/tutor/:user', getClassesList)
-router.get('/session/tutor/:user', getSessionsByTutor)
+router.get('/session/tutor/:id', getSessionsByTutor)
 router.put('/session/accept/:sessionId', acceptSession)
 router.put('/session/cancel/:sessionId', cancelSession)
 router.put('/session/update/date/:sessionId', updateDate)
