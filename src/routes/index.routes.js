@@ -30,7 +30,8 @@ import {
     createUser,
     checkUser,
     registerUser,
-    testRegister
+    testRegister,
+    checkIfRegistered
 } from "../controllers/register.controllers.js";
 
 const router = Router();
@@ -67,7 +68,7 @@ router.get('/classes/:classId', getClassesByTutor)
 
 //Register-------------
 router.post('/register', registerUser)
-router.post('/register/check', registerUser)
+router.post('/register/check', checkIfRegistered)
 router.post('/testRegister', testRegister)
 router.post('/newUser', createUser)
 router.get('/checkUser/:user', checkUser)
