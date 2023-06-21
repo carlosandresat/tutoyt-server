@@ -29,7 +29,8 @@ import {
 import { 
     createUser,
     checkUser,
-    registerUser
+    registerUser,
+    testRegister
 } from "../controllers/register.controllers.js";
 
 const router = Router();
@@ -66,6 +67,7 @@ router.get('/classes/:classId', getClassesByTutor)
 
 //Register-------------
 router.post('/register', registerUser)
+router.post('/testRegister', testRegister)
 router.post('/newUser', createUser)
 router.get('/checkUser/:user', checkUser)
 
