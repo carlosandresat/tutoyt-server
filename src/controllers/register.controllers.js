@@ -37,4 +37,6 @@ export const registerUser = async (req, res) => {
 
 export const testRegister = async (req, res) => {
     console.log(req.body)
+
+    res.json(req.body);
 }
