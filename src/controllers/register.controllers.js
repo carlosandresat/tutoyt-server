@@ -42,8 +42,11 @@ export const testRegister = async (req, res) => {
 }
 
 export const checkIfRegistered = async (req, res) => {
+
+    const { user_id } = req.body;
+
     const [result] = await pool.query("SELECT * FROM user WHERE id = ?", [
-        req.params.user_id,
+        user_id,
     ])
     if(result.length == 0)
         return res.json({message: "Usuario no registrado"})
