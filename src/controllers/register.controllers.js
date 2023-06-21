@@ -34,3 +34,7 @@ export const registerUser = async (req, res) => {
 
     res.json(result);
 }
+
+export const testRegister = async (req, res) => {
+    console.log(req.body)
+}
