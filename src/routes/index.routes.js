@@ -67,6 +67,7 @@ router.get('/classes/:classId', getClassesByTutor)
 
 //Register-------------
 router.post('/register', registerUser)
+router.post('/register/check/:user_id', registerUser)
 router.post('/testRegister', testRegister)
 router.post('/newUser', createUser)
 router.get('/checkUser/:user', checkUser)
