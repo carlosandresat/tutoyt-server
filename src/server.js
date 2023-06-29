@@ -37,6 +37,12 @@ app.get('/tutores', async (req, res)=>{
     res.json(rows)    
 })
 
+app.get('/all', async (req, res)=>{
+
+    const [rows] = await pool.query('Select * from user')
+    res.json(rows)    
+})
+
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token
     if(!token) {
