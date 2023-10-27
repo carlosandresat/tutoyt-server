@@ -1,7 +1,7 @@
 import { pool } from "../db.js"
 
 export const getTutorsByClass = async (req, res) => {
-    const [result] = await pool.query("SELECT name FROM tutor_classes a INNER JOIN user b ON a.id_tutor = b.id WHERE id_classes = ?", [
+    const [result] = await pool.query("SELECT id, name FROM tutor_classes a INNER JOIN user b ON a.id_tutor = b.id WHERE id_classes = ?", [
         req.params.tutorId,
     ])
     if(result.length == 0)

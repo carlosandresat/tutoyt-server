@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
 import {pool} from './db.js'
 import {PORT} from './config.js'
+import './firebase-messaging-sw.js'
 
 import indexRoutes from './routes/index.routes.js'
 
@@ -13,11 +14,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors(
     {
-        origin: [
-            "http://localhost:3000",
-            "http://192.168.20.108:3000",
-            "https://tutoyt-react-production.up.railway.app"
-    ],
+       
         credentials: true
     }
 ))
@@ -33,7 +30,7 @@ app.get('/asignaturas', async (req, res)=>{
 })
 app.get('/tutores', async (req, res)=>{
 
-    const [rows] = await pool.query('SELECT   u.id, u.name,    u.pic_url,    TRUNCATE(AVG(s.stars), 1) AS rating, COUNT(s.stars) AS nreviews  FROM    user u    INNER JOIN session s ON u.id = s.id_tutor  GROUP BY   u.id, u.name,    u.pic_url  HAVING    COUNT(s.stars) >= 1  ORDER BY    rating DESC')
+    const [rows] = await pool.query('SELECT   u.id, u.name,    u.pic_url,    TRUNCATE(AVG(s.rate_tutor), 1) AS rating, COUNT(s.stars) AS nreviews  FROM    user u    INNER JOIN session s ON u.id = s.id_tutor  GROUP BY   u.id, u.name,    u.pic_url  HAVING    COUNT(s.stars) >= 1  ORDER BY    rating DESC')
     res.json(rows)    
 })
 
