@@ -1,11 +1,38 @@
 import { pool } from "../db.js"
+import {default as Twilio} from "twilio"
+
+const accountSid = 'AC948e6e776ff454348e57f05923c2bf26';
+const authToken = '98ea1068712edfeee136c9d778871131';
+const client = Twilio(accountSid, authToken);
+
+function formatDateToLocalString(dateTime) {
+    const year = dateTime.getFullYear();
+    const month = String(dateTime.getMonth() + 1).padStart(2, '0');
+    const day = String(dateTime.getDate()).padStart(2, '0');
+    const hours = String(dateTime.getHours()).padStart(2, '0');
+    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  }
+
 
 export const requestSession = async (req, res) => {
-    const { student, tutor, className, date, time, place, topic, duration} = req.body;
+    const { student, tutor, className, datetime, place, topic, duration} = req.body;
+    const serverDate = new Date(datetime)
+    console.log('Tutoring request at: ', formatDateToLocalString(serverDate), " by user ", student)
+
+
     const [result] = await pool.query(
-        "INSERT INTO session(id_student, id_tutor, id_class, status, date, time, place, topic, duration) VALUES (?, ?, (SELECT id FROM classes where name= ?), 'requested', ?, ?, ?, ?, ?)",
-        [student, tutor, className, date, time, place, topic, duration]
+        "INSERT INTO session(id_student, id_tutor, id_class, status, date, place, topic, duration) VALUES (?, ?, (SELECT id FROM classes where name= ?), 'requested', ?, ?, ?, ?)",
+        [student, tutor, className, formatDateToLocalString(serverDate), place, topic, duration]
     );
+
+    /*const message = await client.messages.create({
+        body: 'Conf si funciona Karyyyy',
+        from: 'whatsapp:+14155238886',
+        to: 'whatsapp:+593963963170',
+        sendAt: serverDate.toISOString()
+    });*/
 
     const [newTutoring] = await pool.query("SELECT status, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, code FROM session INNER JOIN (SELECT classes.id, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id WHERE session.id =  ?", [
         result.insertId,
@@ -16,17 +43,17 @@ export const requestSession = async (req, res) => {
         name: className, 
         date_raw: newTutoring[0].date_raw,
         date: newTutoring[0].date, 
-        time,
         place,
+        duration,
         topic,
         tutor,
-        status: newTutoring[0].status,
+        status: 'requested',
         code: newTutoring[0].code
     });
 }
 
 export const getSessionsByTutor = async (req, res) => {
-    const [result] = await pool.query("SELECT session.id, session.topic, session.status, session.place, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, classes.name as classname, user.name as student, session.rate_student FROM session INNER JOIN classes ON session.id_class = classes.id INNER JOIN user ON session.id_student = user.id WHERE id_tutor = ? AND date >= CURDATE() - 1 ORDER BY date_raw, time", [
+    const [result] = await pool.query("SELECT session.id, session.topic, session.status, session.place, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(date, '%H:%i') as time, session.duration, classes.name as classname, user.user as student, session.rate_student FROM session INNER JOIN classes ON session.id_class = classes.id INNER JOIN user ON session.id_student = user.id WHERE id_tutor = ? AND DATE(date) >= CURDATE() - 1 ORDER BY date_raw", [
         req.params.id,
     ])
     if(result.length == 0)
@@ -36,9 +63,10 @@ export const getSessionsByTutor = async (req, res) => {
 }
 
 export const getSessionsByStudent = async (req, res) => {
-    const [result] = await pool.query("SELECT session.id, session.topic, user.name as tutor, session.status, session.changes, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(time, '%H:%i') as time, session.place, classdata.name, code, session.rate_tutor FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id INNER JOIN user ON user.id = session.id_tutor WHERE id_student = ? AND date >= CURDATE() - 1 ORDER BY date_raw, time", [
+    const [result] = await pool.query("SELECT session.id, session.topic, user.user as tutor, session.status, session.changes, date as date_raw, DATE_FORMAT(date, '%d/%c/%Y') AS date, TIME_FORMAT(date, '%H:%i') as time, session.duration, session.place, classdata.name, code, session.rate_tutor FROM session INNER JOIN (SELECT classes.id, classes.name, code FROM classes INNER JOIN school ON classes.id_school = school.id) classdata ON session.id_class = classdata.id INNER JOIN user ON user.id = session.id_tutor WHERE id_student = ? AND DATE(date) >= CURDATE() - 1 ORDER BY date_raw", [
         req.params.id,
     ])
+
     if(result.length == 0)
         return res.status(404).json({message: "No hay tutorías"});
 
@@ -46,7 +74,7 @@ export const getSessionsByStudent = async (req, res) => {
 }
 
 export const getTutorSessionsByDate = async (req, res) => {
-    const [result] = await pool.query("SELECT session.id, DATE_FORMAT(date, '%Y-%c-%d') AS date, TIME_FORMAT(time, '%H:%i') as time, duration FROM session WHERE id_tutor = ? AND date = ?", [
+    const [result] = await pool.query("SELECT session.id, date, duration FROM session WHERE id_tutor = ? AND DATE(date) = ?", [
         req.params.id, req.params.date
     ])
     
@@ -75,14 +103,17 @@ export const acceptSession = async (req, res) => {
 }
 
 export const updateDate = async (req, res) => {
-    const { date, time } = req.body;
+    const { date } = req.body;
 
-    const result = await pool.query("UPDATE session SET date = ?, time = ?, changes = 'fecha/hora', status = 'changed' WHERE id = ?", [
-        date, time, req.params.sessionId
+    const serverDate = new Date(date)
+
+    const result = await pool.query("UPDATE session SET date = ?, changes = 'fecha/hora', status = 'changed' WHERE id = ?", [
+        formatDateToLocalString(serverDate), req.params.sessionId
     ]);
+
+    console.log(result)
     res.json({ 
         date, 
-        time
     })
 }
 
@@ -105,21 +136,23 @@ export const updateTopic = async (req, res) => {
 }
 
 export const updateDatePlace = async (req, res) => {
-    const { date, time, place } = req.body;
+    const { date, place } = req.body;
+    const serverDate = new Date(date)
 
-    const result = await pool.query("UPDATE session SET date = ?, time = ?,  place = ?, changes = 'fecha/hora y lugar', status = 'changed' WHERE id = ?", [
-        date, time, place, req.params.sessionId
+    const result = await pool.query("UPDATE session SET date = ?,  place = ?, changes = 'fecha/hora y lugar', status = 'changed' WHERE id = ?", [
+        formatDateToLocalString(serverDate), place, req.params.sessionId
     ]);
-    res.json({ date, time, place })
+    res.json({ date, place })
 }
 
 export const updateDateTopic = async (req, res) => {
-    const { date, time, topic } = req.body;
+    const { date, topic } = req.body;
+    const serverDate = new Date(date)
 
-    const result = await pool.query("UPDATE session SET date = ?, time = ?,  topic = ?, changes = 'fecha/hora y tema', status = 'changed' WHERE id = ?", [
-        date, time, topic, req.params.sessionId
+    const result = await pool.query("UPDATE session SET date = ?, topic = ?, changes = 'fecha/hora y tema', status = 'changed' WHERE id = ?", [
+        formatDateToLocalString(serverDate), topic, req.params.sessionId
     ]);
-    res.json({ date, time, topic })
+    res.json({ date, topic })
 }
 
 export const updatePlaceTopic = async (req, res) => {
@@ -132,33 +165,52 @@ export const updatePlaceTopic = async (req, res) => {
 }
 
 export const updateAll = async (req, res) => {
-    const { date, time, place, topic } = req.body;
+    const { date, place, topic } = req.body;
+    const serverDate = new Date(date)
 
-    const result = await pool.query("UPDATE session SET date = ?, time = ?, place = ?,  topic = ?, changes = 'fecha/hora, lugar y tema', status = 'changed' WHERE id = ?", [
-        date, time, place, topic, req.params.sessionId
+    const result = await pool.query("UPDATE session SET date = ?, place = ?,  topic = ?, changes = 'fecha/hora, lugar y tema', status = 'changed' WHERE id = ?", [
+        formatDateToLocalString(serverDate), place, topic, req.params.sessionId
     ]);
     res.json({
         date,
-        time,
         place,
         topic,
     })
 }
 
 export const rateTutor = async (req, res) => {
-    const { rate } = req.body;
+    const { rate, comment } = req.body;
 
-    const result = await pool.query("UPDATE session SET rate_tutor = ? WHERE id = ?", [
-        rate, req.params.sessionId
+        const result = await pool.query("UPDATE session SET rate_tutor = ?, comment_tutor= ? WHERE id = ?", [
+            rate, comment, req.params.sessionId
+        ]);
+        res.json(result)        
+}
+
+
+export const rateStudent = async (req, res) => {
+    const { rate, comment } = req.body;
+
+    const result = await pool.query("UPDATE session SET rate_student = ?, comment_student = ? WHERE id = ?", [
+        rate, comment,  req.params.sessionId
     ]);
     res.json(result)
 }
 
-export const rateStudent = async (req, res) => {
-    const { rate } = req.body;
+export const reportSession = async (req, res) => {
+    const { id_session, id_reporter, comment } = req.body;
 
-    const result = await pool.query("UPDATE session SET rate_student = ? WHERE id = ?", [
-        rate, req.params.sessionId
-    ]);
+    const result = await pool.query("INSERT INTO session_reports(id_session, id_reporter, comment) VALUES (?, ?, ?)", [
+        id_session, id_reporter, comment
+    ])
+    res.json(result)
+}
+
+export const getAdminView = async (req, res) => {
+    
+    const [result] = await pool.query("SELECT s.*, u.name as student, v.name as tutor, c.name AS classname FROM session s INNER JOIN user u ON s.id_student = u.id INNER JOIN user v ON s.id_tutor = v.id INNER JOIN classes c ON s.id_class = c.id ORDER BY date")
+    if(result.length == 0)
+        return res.json({message: "No hay tutorías"});
+
     res.json(result)
 }

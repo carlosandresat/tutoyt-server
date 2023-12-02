@@ -11,18 +11,23 @@ export const checkUser = async (req, res) => {
 }
 
 export const createUser = async (req, res) => {
-    const { name, password, user} = req.body;
-    const [result] = await pool.query(
-        "INSERT INTO user(name, password, user, status) VALUES (?, ?, ?, 0)",
-        [name, password, user]
+    const { name, user, password, classroom, phone} = req.body;
+    const [isRegistered] = await pool.query(
+        "SELECT * FROM user WHERE user = ?",
+        [user]
     );
-
-    res.json({
-        id: result.insertId,
-        name,
-        password,
-        user
-    });
+    if(isRegistered.length != 0){
+        return res.json({message: "Usuario ya registrado"})
+    } else {
+        await pool.query(
+            "INSERT INTO user(name, user, password, classroom, phone, status, created_at) VALUES (?, ?, ?, ?, ?, 'estudiante', NOW())",
+            [name, user, password, classroom, phone]
+        );
+        return res.json({
+            status: "Success"
+        });
+    
+    }
 }
 
 export const registerUser = async (req, res) => {
